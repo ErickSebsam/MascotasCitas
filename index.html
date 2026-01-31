@@ -1,58 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mascotas</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <meta charset="UTF-8">
+  <title>Administrador de Citas</title>
+
+  <!-- Bulma -->
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
 
 <section class="section">
   <div class="container">
 
+    <!-- TÍTULO -->
     <h1 class="title has-text-centered">
-      Agenda tu Cita Veterinaria
+      Administrador de citas
     </h1>
 
-    <div class="box">
-      <form>
+    <!-- FILTROS Y BOTÓN -->
+    <div class="columns is-vcentered mb-5">
 
-        <div class="field">
-          <label class="label">Nombre del dueño</label>
-          <div class="control">
-            <input class="input" type="text" placeholder="Ej: Juan Pérez">
-          </div>
+      <!-- Filtro -->
+      <div class="column is-4">
+        <label class="label">Filtrar por estado</label>
+        <div class="select is-fullwidth">
+          <select>
+            <option>Abierta</option>
+            <option>Completada</option>
+            <option>Cancelada</option>
+          </select>
         </div>
+      </div>
 
-        <div class="field">
-          <label class="label">Nombre de la mascota</label>
-          <div class="control">
-            <input class="input" type="text" placeholder="Firulais">
-          </div>
-        </div>
+      <!-- Espacio vacío para empujar botón -->
+      <div class="column"></div>
 
-        <div class="field">
-          <label class="label">Fecha</label>
-          <div class="control">
-            <input class="input" type="date">
-          </div>
-        </div>
+      <!-- Botón Agregar -->
+      <div class="column is-3 has-text-right">
+        <button class="button is-success is-light">
+          + Agregar cita
+        </button>
+      </div>
 
-        <div class="field">
-          <label class="label">Hora</label>
-          <div class="control">
-            <input class="input" type="time">
-          </div>
-        </div>
+    </div>
 
-        <div class="field has-text-centered">
-          <button class="button is-success">
-            Agendar Cita
-          </button>
-        </div>
+    <hr>
 
-      </form>
+    <!-- LISTADO DE CITAS -->
+    <div class="columns is-multiline">
+
+      <!-- CITA 1 -->
+      <div class="column is-4">
+        <div id="listaCitas" class="columns is-multiline">
+  <!-- Aquí se agregarán las citas dinámicamente -->
+</div>
+      </div>
+
+      <!-- Puedes duplicar este bloque para más citas -->
+
     </div>
 
   </div>
