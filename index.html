@@ -6,59 +6,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VetManager Pro | Video Edition</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
 
   <style>
-    /* --- ESTILOS DE LA CARTA --- */
+    /* --- ESTILOS MEJORADOS --- */
     .mascota-card {
-      border-radius: 15px;
-      border: none;
-      transition: all 0.3s ease;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       overflow: hidden;
-      background: #2c3e50;
-      z-index: 1;
-      min-height: 240px;
+      background: #1a1a1a;
+      /* Fondo oscuro base */
+      height: 550px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .mascota-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6);
     }
 
     .video-background {
       position: absolute;
-      top: 50%; left: 50%;
-      width: 100%; height: 100%;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       transform: translate(-50%, -50%);
-      z-index: -2;
+      z-index: 0;
+      opacity: 0.6;
+      /* Video más sutil */
     }
 
+    /* Capa de protección para que el texto resalte */
     .video-overlay {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%);
-      z-index: -1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg,
+          rgba(0, 0, 0, 0.4) 0%,
+          rgba(0, 0, 0, 0.2) 40%,
+          rgba(0, 0, 0, 0.9) 100%);
+      z-index: 1;
     }
 
-    /* --- NOTIFICACIÓN DE ERROR FLOTANTE --- */
-    #notification-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      width: 300px;
+    .cositas {
+      position: relative;
+      z-index: 2;
+      /* Por encima del video y el overlay */
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
-    .notification.is-danger {
-      animation: slideIn 0.4s ease forwards;
+    .card-content-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      /* Empuja el contenido hacia abajo para estilo moderno */
+      padding: 1.5rem;
+      color: white;
     }
 
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    .card-title-main {
+      font-size: 2.2rem !important;
+      font-weight: 900;
+      margin-bottom: 0.2rem !important;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+      letter-spacing: -1px;
+      display: flex;
+      justify-content: center;
     }
 
-    .input.is-invalid, .textarea.is-invalid, .select.is-invalid select {
-      border: 2px solid #ff3860 !important;
-      background-color: #fff8f8;
+    /* La caja de datos ahora es tipo "Glass" */
+    .data-box {
+      background: rgba(255, 255, 255, 0.08);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 1.2rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 1rem;
+    }
+
+    .info-label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #00d1b2;
+      /* Turquesa de Bulma */
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-bottom: 2px;
+    }
+
+    .info-item strong {
+      color: #ffffff !important;
+      font-size: 1.1rem;
+    }
+
+    .info-item {
+      color: #e0e0e0;
+      margin-bottom: 10px;
+    }
+
+    /* Footer más limpio */
+    .card-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .card-footer-item {
+      color: #fff !important;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      transition: background 0.3s;
+    }
+
+    .card-footer-item:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
     }
   </style>
 </head>
@@ -67,13 +139,27 @@
 
   <div id="notification-container"></div>
 
+  <div class="modal" id="modalEliminar">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <div class="box has-text-centered">
+        <h3 class="title is-4">¿Eliminar registro?</h3>
+        <p>Esta acción no se puede deshacer.</p>
+        <div class="buttons is-centered mt-5">
+          <button id="confirmarBorrarBtn" class="button is-danger">Sí, eliminar</button>
+          <button onclick="cerrarEliminar()" class="button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <section class="section">
     <div class="container">
       <div class="has-text-centered mb-5">
-        <h1 class="title is-2"><span class="material-symbols-rounded">pets</span> VetManager Pro</h1>
+        <h1 class="title is-2"><span class="material-symbols-rounded">pets</span> Animales</h1>
       </div>
 
-      <div class="box is-radiusless" style="border-radius: 12px !important;">
+      <div class="box is-radiusless" style="border-radius: 12px !important; background: #f5f5f5;">
         <div class="columns is-vcentered">
           <div class="column is-4">
             <div class="field">
@@ -89,8 +175,7 @@
             </div>
           </div>
           <div class="column has-text-right">
-            <button onclick="limpiarTodo()" class="button is-light is-rounded is-small mr-2">Limpiar Base de Datos</button>
-            
+            <button onclick="limpiarTodo()" class="button is-ghost is-small mr-2">Borrar todo</button>
             <button id="btnAbrirModal" class="button is-primary is-rounded is-medium">
               <span class="material-symbols-rounded mr-2">add</span> Agendar Paciente
             </button>
@@ -107,53 +192,31 @@
     <div class="modal-card">
       <header class="modal-card-head has-background-primary">
         <p class="modal-card-title has-text-white">Registro de Paciente</p>
-        <button class="delete" aria-label="close" onclick="cerrarModalCita()"></button>
+        <button class="delete" onclick="cerrarModalCita()"></button>
       </header>
       <section class="modal-card-body">
         <div class="columns is-multiline">
-          <div class="column is-6">
-            <label class="label">Mascota</label>
-            <input id="mascota" class="input" placeholder="Nombre">
-          </div>
+          <div class="column is-6"><label class="label">Mascota</label><input id="mascota" class="input"></div>
           <div class="column is-6">
             <label class="label">Especie</label>
-            <div class="select is-fullwidth" id="selectCont-tipoMascota">
-              <select id="tipoMascota">
-                <option value="">Seleccione...</option>
+            <div class="select is-fullwidth"><select id="tipoMascota">
                 <option value="perro">Perro</option>
                 <option value="gato">Gato</option>
                 <option value="ave">Ave</option>
-                <option value="reptil">Reptil</option>
-                <option value="conejo">Conejo</option>
-              </select>
-            </div>
+              </select></div>
           </div>
+          <div class="column is-6"><label class="label">Dueño</label><input id="propietario" class="input"></div>
           <div class="column is-6">
             <label class="label">Estado</label>
-            <div class="select is-fullwidth is-info">
-              <select id="estado">
+            <div class="select is-fullwidth"><select id="estado">
                 <option value="Abierta">Abierta</option>
                 <option value="Terminada">Terminada</option>
-                <option value="Anulada">Anulada</option>
-              </select>
-            </div>
+              </select></div>
           </div>
-          <div class="column is-6">
-            <label class="label">Propietario</label>
-            <input id="propietario" class="input">
-          </div>
-          <div class="column is-6">
-            <label class="label">Fecha</label>
-            <input id="fecha" type="date" class="input">
-          </div>
-          <div class="column is-6">
-            <label class="label">Hora</label>
-            <input id="hora" type="time" class="input">
-          </div>
-          <div class="column is-12">
-            <label class="label">Síntomas</label>
-            <textarea id="sintomas" class="textarea" rows="2"></textarea>
-          </div>
+          <div class="column is-6"><label class="label">Fecha</label><input id="fecha" type="date" class="input"></div>
+          <div class="column is-6"><label class="label">Hora</label><input id="hora" type="time" class="input"></div>
+          <div class="column is-12"><label class="label">Síntomas</label><textarea id="sintomas" class="textarea"
+              rows="2"></textarea></div>
         </div>
       </section>
       <footer class="modal-card-foot">
@@ -163,61 +226,92 @@
   </div>
 
   <script>
-    // 1. CARGA INICIAL: Si quieres que inicie VACÍO de verdad, borra tu historial del navegador o usa el botón "Limpiar Base de Datos"
     let citas = JSON.parse(localStorage.getItem('citas_vet')) || [];
     let editingID = null;
+    let borrandoID = null;
 
-    const camposOBL = ['mascota', 'tipoMascota', 'propietario', 'fecha', 'hora', 'sintomas'];
+    function mostrarCitas() {
+      const filtro = document.getElementById("filtroEstado").value;
+      const lista = document.getElementById("listaCitas");
+      lista.innerHTML = "";
 
-    function mostrarError(mensaje) {
-      const container = document.getElementById('notification-container');
-      const notif = document.createElement('div');
-      notif.className = 'notification is-danger is-light';
-      notif.innerHTML = `<button class="delete"></button>${mensaje}`;
-      container.appendChild(notif);
-      setTimeout(() => { if(notif) notif.remove(); }, 3000);
-      notif.querySelector('.delete').onclick = () => notif.remove();
+      const filtradas = citas.filter(c => filtro === "todas" || c.estado === filtro);
+
+      filtradas.forEach(c => {
+        const tagColor = c.estado === 'Abierta' ? 'is-success' : c.estado === 'Terminada' ? 'is-info' : 'is-danger';
+        // Dentro del filtradas.forEach de tu función mostrarCitas:
+        lista.innerHTML += `
+  <div class="column is-4">
+    <div class="card mascota-card">
+      <video class="video-background" autoplay muted loop playsinline>
+        <source src="${c.tipoMascota.toLowerCase()}.mp4" type="video/mp4">
+      </video>
+      <div class="video-overlay"></div>
+
+      <div class="cositas">
+        <div class="card-content-wrapper">
+          
+          <h2 class="card-title-main">${c.mascota}</h2>
+          <span class="tag ${tagColor} is-rounded mb-2">${c.estado.toUpperCase()}</span>
+          <div class="data-box">
+            <div class="columns is-mobile is-multiline is-gapless">
+              <div class="column is-6 info-item">
+                <span class="info-label">Especie</span>
+                <strong>${c.tipoMascota}</strong>
+              </div>
+              <div class="column is-6 info-item">
+                <span class="info-label">Cita</span>
+                <strong>${c.hora}</strong>
+              </div>
+              <div class="column is-12 info-item">
+                <span class="info-label">Propietario</span>
+                <strong>${c.propietario}</strong>
+              </div>
+            </div>
+            <div class="info-item mt-2">
+              <p class="is-size-7 is-italic" style="color: #bbb;">"${c.sintomas}"</p>
+            </div>
+          </div>
+        </div>
+
+        <footer class="card-footer">
+          <a class="card-footer-item" onclick="prepararEdicion(${c.id})">EDITAR</a>
+          <a class="card-footer-item has-text-danger" onclick="abrirEliminar(${c.id})">ELIMINAR</a>
+        </footer>
+      </div>
+    </div>
+  </div>`;
+      });
     }
 
+    // Funciones de Modal y Guardado (se mantienen igual pero con IDs corregidos)
     document.getElementById("btnAbrirModal").onclick = () => {
       editingID = null;
-      camposOBL.forEach(id => {
-          const el = document.getElementById(id);
-          el.value = "";
-          el.classList.remove('is-invalid');
-      });
+      document.querySelectorAll('.input, textarea').forEach(el => el.value = "");
       document.getElementById("modalCita").classList.add("is-active");
     };
 
-    function cerrarModalCita() { 
-      document.getElementById("modalCita").classList.remove("is-active"); 
-    }
+    function cerrarModalCita() { document.getElementById("modalCita").classList.remove("is-active"); }
 
     document.getElementById("guardarCita").onclick = () => {
-      let faltantes = [];
-      const data = { estado: document.getElementById('estado').value };
+      const data = {
+        mascota: document.getElementById('mascota').value,
+        tipoMascota: document.getElementById('tipoMascota').value,
+        propietario: document.getElementById('propietario').value,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        sintomas: document.getElementById('sintomas').value,
+        estado: document.getElementById('estado').value,
+        id: editingID || Date.now()
+      };
 
-      camposOBL.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el.value) {
-          faltantes.push(id);
-          el.classList.add('is-invalid');
-        } else {
-          el.classList.remove('is-invalid');
-          data[id] = el.value;
-        }
-      });
-
-      if (faltantes.length > 0) {
-        mostrarError("Por favor llena los campos marcados en rojo.");
-        return;
-      }
+      if (!data.mascota || !data.propietario) return alert("Llena los campos básicos");
 
       if (editingID) {
         const index = citas.findIndex(c => c.id === editingID);
-        citas[index] = { ...data, id: editingID };
+        citas[index] = data;
       } else {
-        citas.push({ ...data, id: Date.now() });
+        citas.push(data);
       }
 
       localStorage.setItem('citas_vet', JSON.stringify(citas));
@@ -225,66 +319,38 @@
       cerrarModalCita();
     };
 
-    // 2. FUNCIÓN DE BORRADO (CORREGIDA)
-    window.borrar = (id) => {
-      if(confirm("¿Estás seguro de eliminar este registro?")) {
-          citas = citas.filter(c => c.id !== id);
-          localStorage.setItem('citas_vet', JSON.stringify(citas));
-          mostrarCitas();
-      }
+    window.abrirEliminar = (id) => {
+      borrandoID = id;
+      document.getElementById("modalEliminar").classList.add("is-active");
     };
 
-    // 3. FUNCIÓN PARA LIMPIAR TODO (POR SI QUIERES VACIAR LA MEMORIA)
-    window.limpiarTodo = () => {
-        if(confirm("Esto borrará TODAS las citas. ¿Continuar?")) {
-            localStorage.removeItem('citas_vet');
-            citas = [];
-            mostrarCitas();
-        }
+    function cerrarEliminar() { document.getElementById("modalEliminar").classList.remove("is-active"); }
+
+    document.getElementById("confirmarBorrarBtn").onclick = () => {
+      citas = citas.filter(c => c.id !== borrandoID);
+      localStorage.setItem('citas_vet', JSON.stringify(citas));
+      mostrarCitas();
+      cerrarEliminar();
     };
-
-    function mostrarCitas() {
-      const filtro = document.getElementById("filtroEstado").value;
-      const lista = document.getElementById("listaCitas");
-      lista.innerHTML = "";
-
-      citas.filter(c => filtro === "todas" || c.estado === filtro).forEach(c => {
-        const tagColor = c.estado === 'Abierta' ? 'is-success' : c.estado === 'Terminada' ? 'is-info' : 'is-danger';
-        lista.innerHTML += `
-          <div class="column is-4">
-            <div class="card mascota-card">
-              <video class="video-background" autoplay muted loop playsinline><source src="${c.tipoMascota.toLowerCase()}.mp4" type="video/mp4"></video>
-              <div class="video-overlay"></div>
-              <div class="card-content" style="color: white !important;">
-                <p class="title is-4 mb-1 has-text-white">${c.mascota}</p>
-                <div class="tags has-addons mb-3">
-                  <span class="tag is-dark">${c.tipoMascota.toUpperCase()}</span>
-                  <span class="tag ${tagColor}">${c.estado}</span>
-                </div>
-                <div class="content is-small">
-                  <p><strong>Dueño:</strong> ${c.propietario}<br>
-                  <strong>Fecha:</strong> ${c.fecha} | ${c.hora}</p>
-                </div>
-              </div>
-              <footer class="card-footer" style="border-top: 1px solid rgba(255,255,255,0.2)">
-                <a class="card-footer-item has-text-info-light" onclick="prepararEdicion(${c.id})">Editar</a>
-                <a class="card-footer-item has-text-danger-light" onclick="borrar(${c.id})">Borrar</a>
-              </footer>
-            </div>
-          </div>`;
-      });
-    }
 
     window.prepararEdicion = (id) => {
-      const cita = citas.find(c => c.id === id);
+      const c = citas.find(x => x.id === id);
       editingID = id;
-      camposOBL.forEach(campo => document.getElementById(campo).value = cita[campo]);
-      document.getElementById('estado').value = cita.estado;
+      document.getElementById('mascota').value = c.mascota;
+      document.getElementById('tipoMascota').value = c.tipoMascota;
+      document.getElementById('propietario').value = c.propietario;
+      document.getElementById('fecha').value = c.fecha;
+      document.getElementById('hora').value = c.hora;
+      document.getElementById('sintomas').value = c.sintomas;
+      document.getElementById('estado').value = c.estado;
       document.getElementById("modalCita").classList.add("is-active");
     };
+
+    window.limpiarTodo = () => { if (confirm("¿Borrar todo?")) { localStorage.clear(); citas = []; mostrarCitas(); } };
 
     document.getElementById("filtroEstado").onchange = mostrarCitas;
     mostrarCitas();
   </script>
 </body>
+
 </html>
