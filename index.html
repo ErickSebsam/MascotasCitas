@@ -1,68 +1,300 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Administrador de Citas</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 
-  <!-- Bulma -->
-  <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    .mascota-card {
+      position: relative;
+    }
+
+    .mascota-icono {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 2.2rem;
+    }
+  </style>
 </head>
+
 <body>
 
-<section class="section">
-  <div class="container">
+  <section class="section">
+    <div class="container">
 
-    <!-- TÍTULO -->
-    <h1 class="title has-text-centered">
-      Administrador de citas
-    </h1>
+      <h1 class="title has-text-centered">Administrador de citas</h1>
 
-    <!-- FILTROS Y BOTÓN -->
-    <div class="columns is-vcentered mb-5">
+      <div class="columns is-vcentered mb-5">
+        <div class="column is-4">
+          <label class="label">Filtrar por estado</label>
+          <div class="select is-fullwidth">
+            <select id="filtroEstado">
+              <option value="todas">Todas</option>
+              <option value="Abierta">Abiertas</option>
+              <option value="Terminada">Terminadas</option>
+              <option value="Anulada">Anuladas</option>
+            </select>
+          </div>
+        </div>
 
-      <!-- Filtro -->
-      <div class="column is-4">
-        <label class="label">Filtrar por estado</label>
-        <div class="select is-fullwidth">
-          <select>
-            <option>Abierta</option>
-            <option>Completada</option>
-            <option>Cancelada</option>
-          </select>
+        <div class="column"></div>
+
+        <div class="column is-3 has-text-right">
+          <button id="btnAbrirModal" class="button is-success">
+            + Agregar cita
+          </button>
         </div>
       </div>
 
-      <!-- Espacio vacío para empujar botón -->
-      <div class="column"></div>
+      <hr>
 
-      <!-- Botón Agregar -->
-      <div class="column is-3 has-text-right">
-        <button class="button is-success is-light">
-          + Agregar cita
-        </button>
-      </div>
-
+      <div id="listaCitas" class="columns is-multiline"></div>
     </div>
+  </section>
 
-    <hr>
+  <!-- MODAL NUEVA CITA -->
+  <div class="modal" id="modalCita">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Nueva cita</p>
+        <button class="delete" id="cerrarModal"></button>
+      </header>
 
-    <!-- LISTADO DE CITAS -->
-    <div class="columns is-multiline">
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Mascota</label>
+          <input id="mascota" class="input">
+        </div>
 
-      <!-- CITA 1 -->
-      <div class="column is-4">
-        <div id="listaCitas" class="columns is-multiline">
-  <!-- Aquí se agregarán las citas dinámicamente -->
-</div>
-      </div>
+        <div class="field">
+          <label class="label">Tipo de mascota</label>
+          <input id="tipoMascota" class="input" placeholder="Ej: Perro, Gato, Iguana">
+        </div>
 
-      <!-- Puedes duplicar este bloque para más citas -->
+        <div class="field">
+          <label class="label">Propietario</label>
+          <input id="propietario" class="input">
+        </div>
 
+        <div class="field">
+          <label class="label">Teléfono</label>
+          <input id="telefono" class="input">
+        </div>
+
+        <div class="field">
+          <label class="label">Fecha</label>
+          <input id="fecha" type="date" class="input">
+        </div>
+
+        <div class="field">
+          <label class="label">Hora</label>
+          <input id="hora" type="time" class="input">
+        </div>
+
+        <div class="field">
+          <label class="label">Síntomas</label>
+          <textarea id="sintomas" class="textarea"></textarea>
+        </div>
+      </section>
+
+      <footer class="modal-card-foot">
+        <button id="guardarCita" class="button is-success">Guardar</button>
+        <button id="cancelarModal" class="button">Cancelar</button>
+      </footer>
     </div>
-
   </div>
-</section>
+
+  <!-- MODAL CONFIRMAR ELIMINACIÓN -->
+  <div class="modal" id="modalEliminar">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Confirmar eliminación</p>
+        <button class="delete" id="cerrarEliminar"></button>
+      </header>
+
+      <section class="modal-card-body">
+        ¿Estás seguro de que deseas eliminar esta cita?
+      </section>
+
+      <footer class="modal-card-foot">
+        <button id="confirmarEliminar" class="button is-danger">Sí, eliminar</button>
+        <button id="cancelarEliminar" class="button">Cancelar</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const citas = [];
+    let citaAEliminar = null;
+
+    const listaCitas = document.getElementById("listaCitas");
+    const filtroEstado = document.getElementById("filtroEstado");
+    const modal = document.getElementById("modalCita");
+    const modalEliminar = document.getElementById("modalEliminar");
+
+    const btnAbrirModal = document.getElementById("btnAbrirModal");
+    const cerrarModal = document.getElementById("cerrarModal");
+    const cancelarModal = document.getElementById("cancelarModal");
+    const guardarCita = document.getElementById("guardarCita");
+
+    const mascotaInput = document.getElementById("mascota");
+    const tipoMascotaInput = document.getElementById("tipoMascota");
+    const propietarioInput = document.getElementById("propietario");
+    const telefonoInput = document.getElementById("telefono");
+    const fechaInput = document.getElementById("fecha");
+    const horaInput = document.getElementById("hora");
+    const sintomasInput = document.getElementById("sintomas");
+
+    const cerrarEliminar = document.getElementById("cerrarEliminar");
+    const cancelarEliminar = document.getElementById("cancelarEliminar");
+    const confirmarEliminar = document.getElementById("confirmarEliminar");
+
+    btnAbrirModal.onclick = () => modal.classList.add("is-active");
+    cerrarModal.onclick = cancelarModal.onclick = () => modal.classList.remove("is-active");
+
+    guardarCita.onclick = () => {
+      const mascota = mascotaInput.value.trim();
+      const tipoMascota = tipoMascotaInput.value.trim();
+      const propietario = propietarioInput.value.trim();
+      const telefono = telefonoInput.value.trim();
+      const fecha = fechaInput.value;
+      const hora = horaInput.value;
+      const sintomas = sintomasInput.value.trim();
+
+      if (!mascota) {
+        alert("El campo Mascota es obligatorio");
+        return;
+      } else if (!propietario) {
+        alert("El campo Propietario es obligatorio");
+        return;
+      } else if (!telefono) {
+        alert("El campo Teléfono es obligatorio");
+        return;
+      } else if (!fecha) {
+        alert("El campo Fecha es obligatorio");
+        return;
+      } else if (!hora) {
+        alert("El campo Hora es obligatorio");
+        return;
+      } else if (!sintomas) {
+        alert("El campo Síntomas es obligatorio");
+        return;
+      }
+
+      const fechaHora = new Date(`${fecha}T${hora}`);
+      if (fechaHora <= new Date()) {
+        alert("La cita debe ser posterior a la fecha actual");
+        return;
+      }
+
+      const h = fechaHora.getHours();
+      if (h < 8 || h >= 20) {
+        alert("Horario permitido: 8 AM a 8 PM");
+        return;
+      }
+
+      citas.push({
+        id: Date.now(),
+        mascota,
+        tipoMascota,
+        propietario,
+        telefono,
+        fecha,
+        hora,
+        sintomas,
+        estado: "Abierta"
+      });
+
+      mostrarCitas(filtroEstado.value);
+      modal.classList.remove("is-active");
+      limpiarFormulario();
+    };
+
+    function limpiarFormulario() {
+      mascotaInput.value = "";
+      tipoMascotaInput.value = "";
+      propietarioInput.value = "";
+      telefonoInput.value = "";
+      fechaInput.value = "";
+      horaInput.value = "";
+      sintomasInput.value = "";
+    }
+
+    filtroEstado.onchange = () => mostrarCitas(filtroEstado.value);
+
+    function obtenerIconoMascota(tipo) {
+      const t = tipo.toLowerCase();
+      if (t.includes("perro")) return "🐶";
+      if (t.includes("gato")) return "🐱";
+      if (t.includes("ave") || t.includes("loro")) return "🐦";
+      if (t.includes("iguana") || t.includes("reptil")) return "🦎";
+      if (t.includes("conejo")) return "🐰";
+      if (t.includes("pez")) return "🐟";
+      return "🐾";
+    }
+    function obtenerClaseEstado(estado) {
+      if (estado === "Abierta") return "is-success";
+      if (estado === "Terminada") return "is-info";
+      if (estado === "Anulada") return "is-danger";
+      return "is-light";
+    }
+    function mostrarCitas(filtro) {
+      listaCitas.innerHTML = "";
+      citas.forEach(c => {
+        if (filtro === "todas" || c.estado === filtro) {
+          listaCitas.innerHTML += `
+          <div class="column is-4">
+            <div class="card mascota-card">
+              <span class="mascota-icono">${obtenerIconoMascota(c.tipoMascota)}</span>
+
+              <div class="card-content">
+                <p class="title is-5">Mascota: ${c.mascota}</p>
+                <p><strong>Tipo:</strong> ${c.tipoMascota}</p>
+                <p><strong>Propietario:</strong> ${c.propietario}</p>
+                <p><strong>Teléfono:</strong> ${c.telefono}</p>
+                <p><strong>Fecha:</strong> ${c.fecha} ${c.hora}</p>
+                <p><strong>Síntomas:</strong> ${c.sintomas}</p>
+
+                <span class="tag ${obtenerClaseEstado(c.estado)} mt-2">
+  ${c.estado}
+</span>
+              </div>
+
+              <footer class="card-footer">
+                <a class="card-footer-item has-text-danger"
+                   onclick="abrirModalEliminar(${c.id})">
+                   Eliminar
+                </a>
+              </footer>
+            </div>
+          </div>
+        `;
+        }
+      });
+    }
+
+    function abrirModalEliminar(id) {
+      citaAEliminar = id;
+      modalEliminar.classList.add("is-active");
+    }
+
+    cerrarEliminar.onclick = cancelarEliminar.onclick = () => {
+      modalEliminar.classList.remove("is-active");
+      citaAEliminar = null;
+    };
+
+    confirmarEliminar.onclick = () => {
+      citas.splice(citas.findIndex(c => c.id === citaAEliminar), 1);
+      mostrarCitas(filtroEstado.value);
+      modalEliminar.classList.remove("is-active");
+    };
+  </script>
 
 </body>
+
 </html>
