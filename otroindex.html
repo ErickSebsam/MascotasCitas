@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéVet Center | TCG Edition</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Flexo:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --poke-gold: #f6bd20;
+      --poke-blue: #3b4cca;
+      --card-border: #e0e0e0;
+    }
+
+    body {
+      background: radial-gradient(circle, #616161 0%, #212121 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .poke-title {
+      color: var(--poke-gold);
+      text-shadow: 3px 3px var(--poke-blue);
+      font-size: 3.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+
+    /* ESTILO CARTA POKÉMON */
+    .pokemon-card {
+      background: #f0f0f0;
+      border: 12px solid var(--poke-gold);
+      border-radius: 15px;
+      box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+      position: relative;
+      transition: transform 0.3s;
+      min-height: 450px;
+    }
+
+    .pokemon-card:hover {
+      transform: scale(1.02) rotate(1deg);
+    }
+
+    .card-header-poke {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      align-items: center;
+    }
+
+    .hp-text {
+      color: #e53935;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .poke-img-container {
+      background: linear-gradient(to bottom, #8e9eab, #eef2f3);
+      margin: 0 15px;
+      border: 4px solid #a0a0a0;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .poke-img-container img {
+      height: 140px;
+      filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
+    }
+
+    .card-body-poke {
+      padding: 15px;
+      background: #e0e0e0;
+      margin: 10px 15px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      position: absolute;
+      bottom: 60px;
+      right: 10px;
+      transform: rotate(-10deg);
+    }
+
+    .poke-footer {
+      border-top: 1px solid #ccc;
+      padding: 10px;
+      background: #fff;
+      display: flex;
+      gap: 5px;
+    }
+
+    /* Estilos Modal */
+    .modal-card-head { background-color: var(--poke-blue); }
+    .modal-card-title { color: white; }
+  </style>
+</head>
+<body>
+
+  <section class="section">
+    <div class="container">
+      <div class="has-text-centered">
+        <h1 class="poke-title">PokéVet Center</h1>
+        <button id="btnAbrirModal" class="button is-warning is-rounded is-large mb-6">
+          <strong>+ NUEVO PACIENTE</strong>
+        </button>
+      </div>
+
+      <div class="field box" style="max-width: 400px; margin: 0 auto 2rem auto;">
+        <label class="label">Filtrar por Gimnasio (Estado)</label>
+        <div class="select is-fullwidth">
+          <select id="filtroEstado">
+            <option value="todas">Ver todos</option>
+            <option value="Abierta">En Batalla (Abierta)</option>
+            <option value="Terminada">Ganador (Terminada)</option>
+            <option value="Anulada">Fuera de Combate (Anulada)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="listaCitas" class="columns is-multiline"></div>
+    </div>
+  </section>
+
+  <div class="modal" id="modalCita">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Datos del Pokémon</p>
+      </header>
+      <section class="modal-card-body">
+        <div class="columns is-multiline">
+          <div class="column is-6">
+            <label class="label">Mote (Nombre)</label>
+            <input id="mascota" class="input" placeholder="Ej: Sparky">
+          </div>
+          <div class="column is-6">
+            <label class="label">Especie Pokémon</label>
+            <div class="select is-fullwidth">
+              <select id="tipoMascota">
+                <option value="Pikachu">Pikachu (Perro/Eléctrico)</option>
+                <option value="Meowth">Meowth (Gato/Normal)</option>
+                <option value="Pidgey">Pidgey (Ave/Volador)</option>
+                <option value="Squirtle">Squirtle (Tortuga/Agua)</option>
+                <option value="Bulbasaur">Bulbasaur (Planta)</option>
+                <option value="Charmander">Charmander (Reptil/Fuego)</option>
+                <option value="Buneary">Buneary (Conejo)</option>
+                <option value="Rattata">Rattata (Hámster/Roedor)</option>
+                <option value="Ponyta">Ponyta (Caballo)</option>
+                <option value="Sentret">Sentret (Hurón)</option>
+                <option value="Magikarp">Magikarp (Pez)</option>
+                <option value="Eevee">Eevee (Evolución)</option>
+              </select>
+            </div>
+          </div>
+          <div class="column is-6">
+            <label class="label">Entrenador</label>
+            <input id="propietario" class="input">
+          </div>
+          <div class="column is-6">
+            <label class="label">Estado Inicial</label>
+            <div class="select is-fullwidth">
+              <select id="estado">
+                <option value="Abierta">Abierta</option>
+                <option value="Terminada">Terminada</option>
+                <option value="Anulada">Anulada</option>
+              </select>
+            </div>
+          </div>
+          <div class="column is-6">
+            <label class="label">Fecha</label>
+            <input id="fecha" type="date" class="input">
+          </div>
+          <div class="column is-6">
+            <label class="label">Hora</label>
+            <input id="hora" type="time" class="input">
+          </div>
+          <div class="column is-12">
+            <label class="label">Problema (Síntomas)</label>
+            <textarea id="sintomas" class="textarea" rows="2"></textarea>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button id="guardarCita" class="button is-success is-fullwidth">¡YO TE ELIJO!</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    let citas = [];
+    let editingID = null;
+
+    const pokemonDB = {
+      Pikachu: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
+      Meowth: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/52.png",
+      Pidgey: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/16.png",
+      Squirtle: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png",
+      Bulbasaur: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
+      Charmander: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
+      Buneary: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/427.png",
+      Rattata: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/19.png",
+      Ponyta: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/77.png",
+      Sentret: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/161.png",
+      Magikarp: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/129.png",
+      Eevee: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png"
+    };
+
+    const modal = document.getElementById("modalCita");
+    const inputs = ['mascota', 'tipoMascota', 'propietario', 'fecha', 'hora', 'sintomas', 'estado'];
+
+    document.getElementById("btnAbrirModal").onclick = () => {
+      editingID = null;
+      inputs.forEach(id => document.getElementById(id).value = "");
+      modal.classList.add("is-active");
+    };
+
+    document.getElementById("guardarCita").onclick = () => {
+      const data = {};
+      inputs.forEach(id => data[id] = document.getElementById(id).value);
+      
+      if(Object.values(data).some(v => !v)) return alert("¡Necesitas llenar todos los datos, Entrenador!");
+
+      if(editingID) {
+        citas = citas.map(c => c.id === editingID ? {...data, id: editingID} : c);
+      } else {
+        citas.push({...data, id: Date.now()});
+      }
+
+      mostrarCitas();
+      modal.classList.remove("is-active");
+    };
+
+    function mostrarCitas() {
+      const filtro = document.getElementById("filtroEstado").value;
+      const lista = document.getElementById("listaCitas");
+      lista.innerHTML = "";
+
+      citas.filter(c => filtro === "todas" || c.estado === filtro).forEach(c => {
+        const imgUrl = pokemonDB[c.tipoMascota];
+        
+        lista.innerHTML += `
+          <div class="column is-3">
+            <div class="pokemon-card">
+              <div class="card-header-poke">
+                <span class="has-text-weight-bold is-size-5">${c.mascota}</span>
+                <span class="hp-text">80 HP</span>
+              </div>
+              
+              <div class="poke-img-container">
+                <img src="${imgUrl}" alt="${c.tipoMascota}">
+              </div>
+
+              <div class="has-text-centered is-size-7 mt-1">
+                Especie: ${c.tipoMascota} Pokémon. Peso: 6kg
+              </div>
+
+              <div class="card-body-poke">
+                <p><strong>Ataque Síntoma:</strong> ${c.sintomas}</p>
+                <p><strong>Entrenador:</strong> ${c.propietario}</p>
+                <p><strong>Cita:</strong> ${c.fecha} - ${c.hora}</p>
+              </div>
+
+              <span class="tag is-medium ${c.estado === 'Abierta' ? 'is-success' : 'is-danger'} status-badge">
+                ${c.estado}
+              </span>
+
+              <footer class="poke-footer">
+                <button class="button is-small is-link is-fullwidth" onclick="editar(${c.id})">EDITAR</button>
+                <button class="button is-small is-danger is-fullwidth" onclick="borrar(${c.id})">BORRAR</button>
+              </footer>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    window.editar = (id) => {
+      editingID = id;
+      const c = citas.find(x => x.id === id);
+      inputs.forEach(id => document.getElementById(id).value = c[id]);
+      modal.classList.add("is-active");
+    };
+
+    window.borrar = (id) => {
+      if(confirm("¿Liberar a este Pokémon?")) {
+        citas = citas.filter(x => x.id !== id);
+        mostrarCitas();
+      }
+    };
+
+    document.getElementById("filtroEstado").onchange = mostrarCitas;
+  </script>
+</body>
+</html>
