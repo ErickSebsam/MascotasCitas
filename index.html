@@ -4,235 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mascotas</title>
+  <title>Velvet</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
-
-  <style>
-    /* --- CAMBIO DE ATMÓSFERA GENERAL --- */
-    body {
-      background-color: #0f172a;
-      /* Fondo oscuro profundo */
-      color: #f8fafc;
-      min-height: 100vh;
-    }
-
-    .title {
-      color: #ffffff !important;
-    }
-
-    /* El encabezado de la página */
-    .section .title span {
-      color: #00d1b2;
-      /* Icono de la huella en turquesa */
-    }
-
-    /* La caja de filtros y botones superior */
-    .box.is-radiusless {
-      background-color: #1e293b !important;
-      /* Azul grisáceo */
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      color: white;
-    }
-
-    .label {
-      color: #94a3b8 !important;
-      /* Etiquetas más suaves */
-    }
-
-    /* --- MEJORA DE LAS CARTAS PARA QUE COMBINEN --- */
-    .mascota-card {
-      background: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-
-    .video-overlay {
-      /* Degradado que funde el video con el color de la carta */
-      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.2), #1e293b);
-    }
-
-    .data-box {
-
-      /* Más oscuro que la carta */
-      border: 1px solid rgba(255, 255, 255, 0.05);
-
-    }
-
-    .card-footer {
-      background: rgba(0, 0, 0, 0.2) !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* --- BOTONES --- */
-    .button.is-primary {
-      background-color: #00d1b2 !important;
-      border: none;
-      font-weight: bold;
-    }
-
-    .button.is-ghost {
-      color: #94a3b8 !important;
-    }
-    .modal-card{
-      background-color: #1e293b;
-    }
-    .modal-card-head {
-      background-color: #00d1b2 !important;
-      margin-bottom: 15px;
-    }
-
-    .modal-card-body {
-      background-color: #1e293b !important;
-      color: white !important;
-    }
-
-    .modal-card-body .label {
-      color: white !important;
-    }
-
-    .modal-card-body .input,
-    .modal-card-body .textarea,
-    .modal-card-body .select select {
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      color: white;
-    }
-    #mensajeError {
-      margin-bottom: 0;
-    }
-    .mascota-card {
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-      overflow: hidden;
-      background: #1a1a1a;
-      /* Fondo oscuro base */
-      height: 550px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .mascota-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6);
-    }
-
-    .video-background {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-      /* Video más sutil */
-    }
-
-    /* Capa de protección para que el texto resalte */
-    .video-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(180deg,
-          rgba(0, 0, 0, 0.4) 0%,
-          rgba(0, 0, 0, 0.2) 40%,
-          rgba(0, 0, 0, 0.9) 100%);
-      z-index: 1;
-    }
-
-    .cositas {
-      position: relative;
-      z-index: 2;
-      /* Por encima del video y el overlay */
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .card-content-wrapper {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      /* Empuja el contenido hacia abajo para estilo moderno */
-      padding: 1.5rem;
-      color: white;
-    }
-
-    .card-title-main {
-      font-size: 2.2rem !important;
-      font-weight: 900;
-      margin-bottom: 0.2rem !important;
-      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
-      letter-spacing: -1px;
-      display: flex;
-      justify-content: center;
-    }
-
-    /* La caja de datos ahora es tipo "Glass" */
-    .data-box {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 1.2rem;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 1rem;
-    }
-
-    .info-label {
-      display: block;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      color: #00d1b2;
-      /* Turquesa de Bulma */
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      margin-bottom: 2px;
-    }
-
-    .info-item strong {
-      color: #ffffff !important;
-      font-size: 1.1rem;
-    }
-
-    .info-item {
-      color: #e0e0e0;
-      margin-bottom: 10px;
-    }
-
-    /* Footer más limpio */
-    .card-footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(5px);
-    }
-
-    .card-footer-item {
-      color: #fff !important;
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      transition: background 0.3s;
-    }
-
-    .card-footer-item:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-    }
-
-    .modal-card-foot {
-      border-top: 1px solid #1f2937;
-      background-color: #1f2937;
-      ;
-    }
-  </style>
+  <link rel="stylesheet" href="estilos.css">
 </head>
 
 <body>
@@ -256,7 +32,7 @@
   <section class="section">
     <div class="container">
       <div class="has-text-centered mb-5">
-        <h1 class="title is-2"><span class="material-symbols-rounded">pets</span> Animales</h1>
+        <h1 class="title is-2"><span class="material-symbols-rounded">pets</span> Velvet</h1>
       </div>
 
       <div class="box is-radiusless" style="border-radius: 12px !important; background: #f5f5f5;">
@@ -357,7 +133,7 @@
   <div class="column is-4">
     <div class="card mascota-card">
       <video class="video-background" autoplay muted loop playsinline>
-        <source src="${c.tipoMascota.toLowerCase()}.mp4" type="video/mp4">
+        <source src="./videos/${c.tipoMascota.toLowerCase()}.mp4" type="video/mp4">
       </video>
       <div class="video-overlay"></div>
 
