@@ -4,13 +4,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VetManager Pro | Video Edition</title>
+  <title>Mascotas</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
 
   <style>
-    /* --- ESTILOS MEJORADOS --- */
+    /* --- CAMBIO DE ATMÓSFERA GENERAL --- */
+    body {
+      background-color: #0f172a;
+      /* Fondo oscuro profundo */
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .title {
+      color: #ffffff !important;
+    }
+
+    /* El encabezado de la página */
+    .section .title span {
+      color: #00d1b2;
+      /* Icono de la huella en turquesa */
+    }
+
+    /* La caja de filtros y botones superior */
+    .box.is-radiusless {
+      background-color: #1e293b !important;
+      /* Azul grisáceo */
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: white;
+    }
+
+    .label {
+      color: #94a3b8 !important;
+      /* Etiquetas más suaves */
+    }
+
+    /* --- MEJORA DE LAS CARTAS PARA QUE COMBINEN --- */
+    .mascota-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .video-overlay {
+      /* Degradado que funde el video con el color de la carta */
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.2), #1e293b);
+    }
+
+    .data-box {
+
+      /* Más oscuro que la carta */
+      border: 1px solid rgba(255, 255, 255, 0.05);
+
+    }
+
+    .card-footer {
+      background: rgba(0, 0, 0, 0.2) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* --- BOTONES --- */
+    .button.is-primary {
+      background-color: #00d1b2 !important;
+      border: none;
+      font-weight: bold;
+    }
+
+    .button.is-ghost {
+      color: #94a3b8 !important;
+    }
+    .modal-card{
+      background-color: #1e293b;
+    }
+    .modal-card-head {
+      background-color: #00d1b2 !important;
+      margin-bottom: 15px;
+    }
+
+    .modal-card-body {
+      background-color: #1e293b !important;
+      color: white !important;
+    }
+
+    .modal-card-body .label {
+      color: white !important;
+    }
+
+    .modal-card-body .input,
+    .modal-card-body .textarea,
+    .modal-card-body .select select {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+    }
+    #mensajeError {
+      margin-bottom: 0;
+    }
     .mascota-card {
       border-radius: 24px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -86,7 +177,6 @@
     /* La caja de datos ahora es tipo "Glass" */
     .data-box {
       background: rgba(255, 255, 255, 0.08);
-      -webkit-backdrop-filter: blur(12px);
       padding: 1.2rem;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -131,6 +221,17 @@
     .card-footer-item:hover {
       background: rgba(255, 255, 255, 0.1) !important;
     }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
+
+    .modal-card-foot {
+      border-top: 1px solid #1f2937;
+      background-color: #1f2937;
+      ;
+    }
   </style>
 </head>
 
@@ -174,7 +275,6 @@
             </div>
           </div>
           <div class="column has-text-right">
-            <button onclick="limpiarTodo()" class="button is-ghost is-small mr-2">Borrar todo</button>
             <button id="btnAbrirModal" class="button is-primary is-rounded is-medium">
               <span class="material-symbols-rounded mr-2">add</span> Agendar Paciente
             </button>
@@ -193,6 +293,7 @@
         <p class="modal-card-title has-text-white">Registro de Paciente</p>
         <button class="delete" onclick="cerrarModalCita()"></button>
       </header>
+      <div id="mensajeError" class="notification is-danger is-light" style="display:none;"></div>
       <section class="modal-card-body">
         <div class="columns is-multiline">
           <div class="column is-6"><label class="label">Mascota</label><input id="mascota" class="input"></div>
@@ -221,12 +322,14 @@
               </select></div>
           </div>
           <div class="column is-6"><label class="label">Fecha</label><input id="fecha" type="date" class="input"></div>
-          <div class="column is-6"><label class="label">Hora</label><input id="hora" type="time" class="input"></div>
+          <div class="column is-6"><label class="label">Hora</label><input id="hora" type="time" class="input"
+              min="08:00" max="20:00">
+          </div>
           <div class="column is-12"><label class="label">Síntomas</label><textarea id="sintomas" class="textarea"
               rows="2"></textarea></div>
-        </div>
       </section>
       <footer class="modal-card-foot">
+
         <button id="guardarCita" class="button is-success is-fullwidth">Confirmar Datos</button>
       </footer>
     </div>
@@ -236,7 +339,10 @@
     let citas = JSON.parse(localStorage.getItem('citas_vet')) || [];
     let editingID = null;
     let borrandoID = null;
-
+    const fechaInput = document.getElementById("fecha");
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate() + 1);
+    fechaInput.min = hoy.toISOString().split("T")[0];
     function mostrarCitas() {
       const filtro = document.getElementById("filtroEstado").value;
       const lista = document.getElementById("listaCitas");
@@ -295,25 +401,92 @@
     document.getElementById("btnAbrirModal").onclick = () => {
       editingID = null;
       document.querySelectorAll('.input, textarea').forEach(el => el.value = "");
+
+      const mensaje = document.getElementById("mensajeError");
+      mensaje.style.display = "none";
+      mensaje.innerHTML = "";
+
       document.getElementById("modalCita").classList.add("is-active");
     };
+
 
     function cerrarModalCita() { document.getElementById("modalCita").classList.remove("is-active"); }
 
     document.getElementById("guardarCita").onclick = () => {
+
+      const mensaje = document.getElementById("mensajeError");
+      mensaje.style.display = "none";
+      mensaje.innerHTML = "";
+
       const data = {
-        mascota: document.getElementById('mascota').value,
+        mascota: document.getElementById('mascota').value.trim(),
         tipoMascota: document.getElementById('tipoMascota').value,
-        propietario: document.getElementById('propietario').value,
+        propietario: document.getElementById('propietario').value.trim(),
         fecha: document.getElementById('fecha').value,
         hora: document.getElementById('hora').value,
-        sintomas: document.getElementById('sintomas').value,
+        sintomas: document.getElementById('sintomas').value.trim(),
         estado: document.getElementById('estado').value,
         id: editingID || Date.now()
       };
 
-      if (!data.mascota || !data.propietario) return alert("Llena los campos básicos");
+      // 🔴 1. Validar campos vacíos
+      if (!data.mascota) {
+        mensaje.innerHTML = "Es necesario colocar el nombre de la mascota.";
+        mensaje.style.display = "block";
+        return;
+      } else if (!data.propietario) {
+        mensaje.innerHTML = "Es necesario colocar el nombre del dueño.";
+        mensaje.style.display = "block";
+        return;
+      } else if (!data.fecha) {
+        mensaje.innerHTML = "Es necesario colocar la fecha.";
+        mensaje.style.display = "block";
+        return;
+      } else if (!data.hora) {
+        mensaje.innerHTML = "Es necesario colocar la hora.";
+        mensaje.style.display = "block";
+        return;
+      } else if (!data.sintomas) {
+        mensaje.innerHTML = "Es necesario colocar los síntomas.";
+        mensaje.style.display = "block";
+        return;
+      }
 
+      // 🔴 2. Validar hora entre 8:00 y 20:00
+      const [hora] = data.hora.split(":").map(Number);
+
+      if (hora < 8 || hora >= 20) {
+        mensaje.innerHTML = "La hora debe estar entre 8:00 AM y 8:00 PM.";
+        mensaje.style.display = "block";
+        return;
+      }
+
+      // 🔴 3. Validar fecha mínima (mañana)
+      const fechaSeleccionada = new Date(data.fecha);
+      const manana = new Date();
+      manana.setDate(manana.getDate() + 1);
+      manana.setHours(0, 0, 0, 0);
+
+      if (fechaSeleccionada < manana) {
+        mensaje.innerHTML = "La fecha debe ser a partir de mañana.";
+        mensaje.style.display = "block";
+        return;
+      }
+
+      // 🔴 4. Validar cita repetida (fecha + hora)
+      const repetida = citas.some(c =>
+        c.fecha === data.fecha &&
+        c.hora === data.hora &&
+        c.id !== editingID
+      );
+
+      if (repetida) {
+        mensaje.innerHTML = "Ya existe una cita registrada en esa fecha y hora.";
+        mensaje.style.display = "block";
+        return;
+      }
+
+      // ✅ Guardar si todo está correcto
       if (editingID) {
         const index = citas.findIndex(c => c.id === editingID);
         citas[index] = data;
