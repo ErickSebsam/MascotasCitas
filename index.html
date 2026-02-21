@@ -109,12 +109,22 @@
 
   <script>
     let citas = JSON.parse(localStorage.getItem('citas_vet')) || [];
+
     let editingID = null;
     let borrandoID = null;
+
+
     const fechaInput = document.getElementById("fecha");
     const hoy = new Date();
     hoy.setDate(hoy.getDate() + 1);
+
+
     fechaInput.min = hoy.toISOString().split("T")[0];
+
+
+
+
+    
     function mostrarCitas() {
       const filtro = document.getElementById("filtroEstado").value;
       const lista = document.getElementById("listaCitas");
@@ -298,7 +308,7 @@
       document.getElementById("modalCita").classList.add("is-active");
     };
 
-    window.limpiarTodo = () => { if (confirm("¿Borrar todo?")) { localStorage.clear(); citas = []; mostrarCitas(); } };
+    // window.limpiarTodo = () => { if (confirm("¿Borrar todo?")) { localStorage.clear(); citas = []; mostrarCitas(); } };
 
     document.getElementById("filtroEstado").onchange = mostrarCitas;
     mostrarCitas();
